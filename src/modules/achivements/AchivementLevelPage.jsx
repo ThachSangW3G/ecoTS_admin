@@ -123,20 +123,20 @@ const AchivementLevelPage = () => {
     setAchivements(await getAllAchivement());
   };
 
-  //   const handleOkDelete = async () => {
-  //     const success = await deleteMaterial(selectId);
-  //     if (success) {
-  //       message.success("Xóa thành công!");
-  //       setSelectId(null);
-  //       callGetMaterials();
-  //     }
+  const handleOkDelete = async () => {
+    // const success = await deleteMaterial(selectId);
+    // if (success) {
+    //   message.success("Xóa thành công!");
+    //   setSelectId(null);
+    //   callGetMaterials();
+    // }
 
-  //     setIsModalDelete(false);
-  //   };
+    setIsModalDelete(false);
+  };
 
-  //   const handleCancelDelete = () => {
-  //     setIsModalDelete(false);
-  //   };
+  const handleCancelDelete = () => {
+    setIsModalDelete(false);
+  };
 
   useEffect(() => {
     callGetAchivementLevels();
@@ -180,8 +180,8 @@ const AchivementLevelPage = () => {
         <Modal
           title="Xác nhận xóa"
           open={isModalDelete}
-          //   onOk={handleOkDelete}
-          //   onCancel={handleCancelDelete}
+          onOk={handleOkDelete}
+          onCancel={handleCancelDelete}
           centered
         >
           <p>Bạn có chắc chắn muốn xóa không?</p>

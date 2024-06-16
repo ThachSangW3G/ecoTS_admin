@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {Achivement} from '../models/Achivement'
-const API_URL = 'https://ecots-be.onrender.com';
+const API_URL = 'https://ecotsbe-production.up.railway.app';
 
 export const getAllAchivement = async () => {
     try {

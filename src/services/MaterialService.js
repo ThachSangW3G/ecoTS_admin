@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {Material} from '../models/Material'
-const API_URL = 'https://ecots-be.onrender.com';
+const API_URL = 'https://ecotsbe-production.up.railway.app';
 
 
 export const getAllMaterials = async () => {
