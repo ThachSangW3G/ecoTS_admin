@@ -6,6 +6,7 @@ import EmployeeIcon from './employee.png';
 import LocationIcon from './location.png';
 import MaterialIcon from './material.png';
 import QuizIcon from './quiz.png';
+import UserIcon from './user.png'
 
 export default {
     AchievementIcon,
@@ -15,4 +16,5 @@ export default {
     LocationIcon,
     MaterialIcon,
     QuizIcon,
+    UserIcon,
 };
