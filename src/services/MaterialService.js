@@ -55,21 +55,17 @@ export const deleteMaterial = async (id) => {
     }
 }
 
-export const updateMaterial = async (id, pointsPerKg, co2SavedPerKg, type) => {
+export const updateMaterial = async (id, pointsPerKg, co2SavedPerKg) => {
     try {
-        const response = await axios.put(`${API_URL}/materials/update/${id}`, {
-            pointsPerKg: pointsPerKg,
-            co2SavedPerKg: co2SavedPerKg,
-            type: type
-        });
+        const response = await axios.put(`${API_URL}/materials/update?id=${id}&pointPerKg=${pointsPerKg}&saveCo2perKg=${co2SavedPerKg}`);
         console.log(response.data);
         console.log(response.status);
-        if (response.status === 200 || response.status == 201) {
+        if (response.status === 200 || response.status === 201) {
             return true;
         }
         return false;
     } catch (e) {
-        console.error('Error fetching:', e);
+        console.error('Error updating:', e);
         return false;
     }
 }
