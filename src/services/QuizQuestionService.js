@@ -31,15 +31,19 @@ export const addNewQuizQuestion = async (topicId, questionText, correctAnswer, i
     }
 };
 
-export const updateQuizQuestion = async (id, topicId, questionText, correctAnswer, incorrectAnswer1, incorrectAnswer2) => {
+export const updateQuizQuestion = async (id, questionText, correctAnswer, incorrectAnswer1, incorrectAnswer2) => {
     try {
-        const response = await axios.put(`${API_URL}/update`, {
-            id,
-            topicId,
+        const response = await axios.put(`${API_URL}/update/${id}`, {
             questionText,
             correctAnswer,
             incorrectAnswer1,
             incorrectAnswer2,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                // Add authorization header if needed
+                // 'Authorization': 'Bearer your_api_key_or_token'
+            },
         });
         return response.data;
     } catch (error) {

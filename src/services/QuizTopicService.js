@@ -40,24 +40,27 @@ export const addNewQuizTopic = async (topicName, description, file) => {
 export const updateQuizTopic = async (id, topicName, description, file) => {
     try {
         const formData = new FormData();
-        formData.append('multipartFile', file.originFileObj);
-        formData.append('topicName', topicName);
-        formData.append('description', description);
+        if (file) {
+            formData.append('multipartFile', file);
+        }
 
-        const response = await axios.put(`${API_URL}/update`, formData, {
-            params: { id },
+        const response = await axios.put(`${API_URL}/update/${id}`, formData, {
+            params: {
+                topicName,
+                description
+            },
             headers: {
                 'Content-Type': 'multipart/form-data',
-                // Add authorization header if needed
-                // 'Authorization': 'Bearer your_api_key_or_token'
             },
         });
+
         return response.data;
     } catch (error) {
         console.error('Error updating quiz topic:', error);
         return false;
     }
 };
+
 
 export const deleteQuizTopic = async (id) => {
     try {
