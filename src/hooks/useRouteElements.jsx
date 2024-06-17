@@ -9,6 +9,7 @@ import DonationPage from "../modules/donations/pages/DonationPage";
 import MaterialsPage from "../modules/materials/pages/MaterialsPage";
 import AchivementLevelPage from "../modules/achivements/AchivementLevelPage";
 import EmployeePage from "../modules/employees/EmployeePage";
+import DetectResponsePage from "../modules/detect_response/DetectResponsePage";
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -60,6 +61,14 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <EmployeePage />
+        </MainLayout>
+      ),
+    },
+    {
+      path: "/detect-response",
+      element: (
+        <MainLayout>
+          <DetectResponsePage />
         </MainLayout>
       ),
     },

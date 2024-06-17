@@ -42,6 +42,11 @@ const items = [
     icon: <FlightIcon />,
     label: <Link to="/employees">Employees Management</Link>,
   },
+  {
+    key: "8",
+    icon: <FlightIcon />,
+    label: <Link to="/detect-response">Detect Response</Link>,
+  },
 ];
 
 const MainLayout = ({ children }) => {
