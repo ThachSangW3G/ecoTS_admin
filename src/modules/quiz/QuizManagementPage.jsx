@@ -62,11 +62,11 @@ const QuizManagementPage = () => {
         event === "addTopic"
           ? await addNewQuizTopic(values.topicName, values.description, imgFile)
           : await updateQuizTopic(
-            selectId,
-            values.topicName,
-            values.description,
-            imgFile
-          );
+              selectId,
+              values.topicName,
+              values.description,
+              imgFile
+            );
 
       if (success) {
         message.success(
@@ -82,19 +82,19 @@ const QuizManagementPage = () => {
       const success =
         event === "addQuestion"
           ? await addNewQuizQuestion(
-            values.topicId,
-            values.questionText,
-            values.correctAnswer,
-            values.incorrectAnswer1,
-            values.incorrectAnswer2
-          )
+              values.topicId,
+              values.questionText,
+              values.correctAnswer,
+              values.incorrectAnswer1,
+              values.incorrectAnswer2
+            )
           : await updateQuizQuestion(
-            selectId,
-            values.questionText,
-            values.correctAnswer,
-            values.incorrectAnswer1,
-            values.incorrectAnswer2
-          );
+              selectId,
+              values.questionText,
+              values.correctAnswer,
+              values.incorrectAnswer1,
+              values.incorrectAnswer2
+            );
 
       if (success) {
         message.success(
@@ -105,6 +105,7 @@ const QuizManagementPage = () => {
         setModalOpenQuestion(false);
         form.resetFields();
         callGetQuizQuestions(selectedTopic);
+        callGetQuizTopics();
       }
     }
 
