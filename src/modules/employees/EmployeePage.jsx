@@ -1,321 +1,515 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  Flex,
   Space,
   Table,
-  Tag,
   Typography,
   Input,
   Modal,
   message,
-  Upload,
-  Divider,
   Form,
   DatePicker,
+  Select,
+  Upload,
+  Avatar,
+  Image,
+  Popconfirm
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-const { Column, ColumnGroup } = Table;
+import axios from "axios";
+import dayjs from 'dayjs';
+import { UploadOutlined } from '@ant-design/icons';
+
+const { Column } = Table;
 const { Search } = Input;
-import "./EmployeePage.css";
 
-import { compareAsc, format, set } from "date-fns";
-
-const { Dragger } = Upload;
+const API_BASE_URL = "https://ecotsbe-production.up.railway.app";
 
 const EmployeePage = () => {
-  const onSearch = (value, _e, info) => console.log(info?.source, value);
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const [form] = Form.useForm();
-
+  const [modalAddOpen, setModalAddOpen] = useState(false);
+  const [modalEditOpen, setModalEditOpen] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [usernameConfirm, setUsernameConfirm] = useState('');
+  const [formAdd] = Form.useForm();
+  const [formEdit] = Form.useForm();
 
-  const onFinish = async (values) => {
-    console.log("Form values:", values);
-
-    // const formData = new FormData();
-
-    // formData.append(
-    //   "backGroundImage",
-    //   values.backGroundImgUrl[0].originFileObj
-    // );
-
-    // values.imgDetailsUrl.forEach((file) => {
-    //   formData.append("imageDetails", file.originFileObj);
-    // });
-
-    // setLoading(true);
-
-    // const success = await createLocation(
-    //   values.locationName,
-    //   values.description,
-    //   values.address,
-    //   values.latitude,
-    //   values.longitude,
-    //   formData
-    // );
-
-    // if (success) {
-    //   setModalOpen(false);
-    //   form.setFieldsValue({
-    //     locationName: "",
-    //     description: "",
-    //     address: "",
-    //     latitude: 0,
-    //     longitude: 0,
-    //     backGroundImgUrl: null,
-    //     imgDetailsUrl: [],
-    //   });
-
-    //   callGetLocations();
-    // }
-
-    // setLoading(false);
-  };
-
-  const normFile = (e) => {
-    console.log("Upload event:", e);
-    if (Array.isArray(e)) {
-      return e;
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/employee/get-all-employee`);
+      setEmployees(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Failed to fetch employees:", error);
     }
-    return e && e.fileList;
   };
 
-  //const [locations, setLocations] = useState([]);
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/location/get-all`);
+      setLocations(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Failed to fetch locations:", error);
+    }
+  };
 
-  //   const callGetLocations = async () => {
-  //     setLocations(await getAllLocations());
-  //   };
+  useEffect(() => {
+    fetchEmployees();
+    fetchLocations();
+  }, []);
 
-  //   useEffect(() => {
-  //     callGetLocations();
-  //   }, []);
+  const onSearch = async (value) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/user/username?username=${value}`);
+      setEmployees(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      message.error("Failed to find employee");
+    }
+  };
+
+  const handleEdit = (record) => {
+    setCurrentEmployee(record);
+    formEdit.setFieldsValue({
+      ...record,
+      dayOfBirth: record.dayOfBirth ? dayjs(record.dayOfBirth) : null
+    });
+    setModalEditOpen(true);
+  };
+
+  const handleDelete = async (id, username) => {
+    if (usernameConfirm !== username) {
+      message.error("Username confirmation does not match.");
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_BASE_URL}/user/delete-user-by-id?id=${id}&username=${username}`);
+      message.success("Employee deleted successfully");
+      fetchEmployees();
+    } catch (error) {
+      message.error("Failed to delete employee");
+    }
+  };
+
+  const onFinishAdd = async (values) => {
+    try {
+      await axios.post(`${API_BASE_URL}/auth/signup?roles=EMPLOYEE&locationId=${values.locationId}`, {
+        ...values,
+      });
+      message.success("Employee registered successfully");
+      setModalAddOpen(false);
+      fetchEmployees();
+    } catch (error) {
+      message.error("Failed to register employee");
+    }
+  };
+
+  const onFinishEdit = async (values) => {
+    try {
+      // Update employee logic
+      message.success("Employee updated successfully");
+      setModalEditOpen(false);
+      fetchEmployees();
+    } catch (error) {
+      message.error("Failed to update employee");
+    }
+  };
+
+  const handleAvatarUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('avatarFile', file);
+    formData.append('employeeId', currentEmployee.id);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/employee/upload-new-avatar`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      message.success("Avatar updated successfully");
+      setCurrentEmployee({
+        ...currentEmployee,
+        avatarUrl: response.data
+      });
+      return response.data;
+    } catch (error) {
+      message.error("Failed to upload avatar");
+      return null;
+    }
+  };
 
   return (
-    <Flex vertical gap="large">
+    <>
       <Typography.Title level={2}>Employee Management</Typography.Title>
-      <Flex justify="space-between">
+      <Space style={{ marginBottom: 16 }}>
         <Search
-          placeholder="Search locations"
+          placeholder="Search employees"
           onSearch={onSearch}
           enterButton
-          className="search-input"
         />
         <Button
           type="primary"
-          style={{
-            backgroundColor: "#8DD3BB",
-            fontWeight: 500,
-            width: "fit-content",
+          style={{ backgroundColor: "#8DD3BB" }}
+          onClick={() => {
+            setCurrentEmployee(null);
+            formAdd.resetFields();
+            setModalAddOpen(true);
           }}
-          onClick={() => setModalOpen(true)}
         >
           Add Employee
         </Button>
-        <Modal
-          centered
-          open={modalOpen}
-          onCancel={() => setModalOpen(false)}
-          footer={null}
-        >
-          <Flex vertical align="center">
-            <div className="form-container">
-              <h1 className="form-title">A new employee information</h1>
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                  locationName: "",
-                  description: "",
-                  address: "",
-                  latitude: 0,
-                  longitude: 0,
-                  backGroundImgUrl: null,
-                  imgDetailsUrl: [],
-                }}
-              >
-                <Form.Item
-                  label="Name of location"
-                  name="locationName"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter location name!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Description"
-                  name="description"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter description!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Address"
-                  name="address"
-                  rules={[
-                    {
-                      required: true,
-
-                      message: "Please enter address!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Latitude"
-                  name="latitude"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Plase select latitude!",
-                    },
-                  ]}
-                >
-                  <Input type="number" />
-                </Form.Item>
-
-                <Form.Item
-                  label="Longitude"
-                  name="longitude"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Plase select longitude!",
-                    },
-                  ]}
-                >
-                  <Input type="number" />
-                </Form.Item>
-
-                <Form.Item
-                  label="Background image"
-                  name="backGroundImgUrl"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  extra="Chọn hoặc kéo thả file vào đây"
-                >
-                  <Dragger
-                    name="backGroundImgUrl"
-                    multiple={false}
-                    action="/upload.do"
-                    listType="picture"
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <UploadOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                      Nhấp hoặc kéo tệp vào khu vực này để tải lên
-                    </p>
-                  </Dragger>
-                </Form.Item>
-
-                <Form.Item
-                  label="Detail images"
-                  name="imgDetailsUrl"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  extra="Chọn hoặc kéo thả file vào đây"
-                >
-                  <Dragger
-                    name="imgDetailsUrl"
-                    multiple={true}
-                    action="/upload.do"
-                    listType="picture"
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <UploadOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                      Nhấp hoặc kéo tệp vào khu vực này để tải lên
-                    </p>
-                  </Dragger>
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit" loading={loading}>
-                    Gửi
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-          </Flex>
-        </Modal>
-      </Flex>
-      <Table dataSource={locations}>
+      </Space>
+      <Table dataSource={employees} rowKey="id">
         <Column title="ID" dataIndex="id" key="id" />
-
-        <Column title="Name" dataIndex="locationName" key="locationName" />
-        <Column title="Description" dataIndex="description" key="description" />
-        <Column
-          title="Address"
-          dataIndex="typeOfLocation"
-          key="typeOfLocation"
-        />
-        <Column title="Latitude" dataIndex="latitude" key="latitude" />
-        <Column title="Longitude" dataIndex="longitude" key="longitude" />
-        <Column
-          title="Background"
-          dataIndex="backGroundImgUrl"
-          key="backGroundImgUrl"
-          render={(text, record) => (
-            <img
-              src={record.backGroundImgUrl}
-              alt="Background Image"
-              style={{ maxWidth: "100px", maxHeight: "100px" }}
-            />
-          )}
-        />
-
-        <Column
-          title="Images Details"
-          dataIndex="imgDetailsUrl"
-          key="imgDetailsUrl"
-          render={(text, record) => (
-            <div>
-              {record.imgDetailsUrl.map((imageUrl, index) => (
-                <img
-                  key={index}
-                  src={imageUrl}
-                  alt={`Image ${index + 1}`}
-                  style={{
-                    maxWidth: "100px",
-                    maxHeight: "100px",
-                    marginRight: "5px",
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        />
+        <Column title="Full Name" dataIndex="fullName" key="fullName" />
+        <Column title="Email" dataIndex="email" key="email" />
+        <Column title="Address" dataIndex="address" key="address" />
+        <Column title="Phone Number" dataIndex="phoneNumber" key="phoneNumber" />
+        <Column title="Personal ID" dataIndex="personalId" key="personalId" />
+        <Column title="Date of Birth" dataIndex="dayOfBirth" key="dayOfBirth" />
 
         <Column
           title="Action"
           key="action"
           render={(_, record) => (
             <Space size="middle">
-              <Button type="primary" style={{ backgroundColor: "#8DD3BB" }}>
+              <Button
+                type="primary"
+                style={{ backgroundColor: "#8DD3BB" }}
+                onClick={() => handleEdit(record)}
+              >
                 Edit
               </Button>
-              <Button danger>Delete</Button>
+              <Popconfirm
+                title={() => (
+                  <>
+                    <p>Are you sure you want to delete this employee?</p>
+                    <p>To confirm, type the username below:</p>
+                    <Input
+                      placeholder="Username"
+                      value={usernameConfirm}
+                      onChange={(e) => setUsernameConfirm(e.target.value)}
+                    />
+                  </>
+                )}
+                onConfirm={() => handleDelete(record.id, record.username)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ disabled: usernameConfirm !== record.username }}
+              >
+                <Button danger>Delete</Button>
+              </Popconfirm>
             </Space>
           )}
         />
       </Table>
-    </Flex>
+
+      <Modal
+        centered
+        open={modalAddOpen}
+        onCancel={() => setModalAddOpen(false)}
+        footer={null}
+      >
+        <Typography.Title level={4}>Add Employee</Typography.Title>
+        <Form
+          form={formAdd}
+          layout="vertical"
+          onFinish={onFinishAdd}
+        >
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Please enter username!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please enter email!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please enter password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            label="Full Name"
+            name="fullName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter full name!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              {
+                required: true,
+                message: "Please enter phone number!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[
+              {
+                required: true,
+                message: "Please enter address!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Personal ID"
+            name="personalId"
+            rules={[
+              {
+                required: true,
+                message: "Please enter personal ID!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Date of Birth"
+            name="dayOfBirth"
+            rules={[
+              {
+                required: true,
+                message: "Please select date of birth!",
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: "Please select gender!",
+              },
+            ]}
+          >
+            <Select>
+              <Select.Option value="Male">Male</Select.Option>
+              <Select.Option value="Female">Female</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Location"
+            name="locationId"
+            rules={[
+              {
+                required: true,
+                message: "Please select location!",
+              },
+            ]}
+          >
+            <Select>
+              {locations.map(location => (
+                <Select.Option key={location.id} value={location.id}>
+                  {location.locationName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        centered
+        open={modalEditOpen}
+        onCancel={() => setModalEditOpen(false)}
+        footer={null}
+      >
+        <Typography.Title level={4}>Edit Employee</Typography.Title>
+        {currentEmployee && (
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <Avatar
+              size={100}
+              src={<Image src={currentEmployee.avatarUrl || '/default-avatar.png'} style={{ width: 100 }} />}
+            />
+            <Upload
+              name="avatar"
+              showUploadList={false}
+              beforeUpload={file => {
+                handleAvatarUpload(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>Change Avatar</Button>
+            </Upload>
+          </div>
+        )}
+        <Form
+          form={formEdit}
+          layout="vertical"
+          onFinish={onFinishEdit}
+          initialValues={currentEmployee}
+        >
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Please enter username!",
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please enter email!",
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+
+          <Form.Item
+            label="Full Name"
+            name="fullName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter full name!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              {
+                required: true,
+                message: "Please enter phone number!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[
+              {
+                required: true,
+                message: "Please enter address!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Personal ID"
+            name="personalId"
+            rules={[
+              {
+                required: true,
+                message: "Please enter personal ID!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Date of Birth"
+            name="dayOfBirth"
+            rules={[
+              {
+                required: true,
+                message: "Please select date of birth!",
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: "Please select gender!",
+              },
+            ]}
+          >
+            <Select>
+              <Select.Option value="Male">Male</Select.Option>
+              <Select.Option value="Female">Female</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
   );
 };
+
 export default EmployeePage;
