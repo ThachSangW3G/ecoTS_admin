@@ -25,13 +25,15 @@ const { Search } = Input;
 const API_BASE_URL = "https://ecotsbe-production.up.railway.app";
 
 const EmployeePage = () => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAddOpen, setModalAddOpen] = useState(false);
+  const [modalEditOpen, setModalEditOpen] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(null);
   const [usernameConfirm, setUsernameConfirm] = useState('');
-  const [form] = Form.useForm();
+  const [formAdd] = Form.useForm();
+  const [formEdit] = Form.useForm();
 
   const fetchEmployees = async () => {
     try {
@@ -67,11 +69,11 @@ const EmployeePage = () => {
 
   const handleEdit = (record) => {
     setCurrentEmployee(record);
-    form.setFieldsValue({
+    formEdit.setFieldsValue({
       ...record,
       dayOfBirth: record.dayOfBirth ? dayjs(record.dayOfBirth) : null
     });
-    setModalOpen(true);
+    setModalEditOpen(true);
   };
 
   const handleDelete = async (id, username) => {
@@ -89,16 +91,27 @@ const EmployeePage = () => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinishAdd = async (values) => {
     try {
       await axios.post(`${API_BASE_URL}/auth/signup?roles=EMPLOYEE&locationId=${values.locationId}`, {
         ...values,
       });
       message.success("Employee registered successfully");
-      setModalOpen(false);
+      setModalAddOpen(false);
       fetchEmployees();
     } catch (error) {
       message.error("Failed to register employee");
+    }
+  };
+
+  const onFinishEdit = async (values) => {
+    try {
+      // Update employee logic
+      message.success("Employee updated successfully");
+      setModalEditOpen(false);
+      fetchEmployees();
+    } catch (error) {
+      message.error("Failed to update employee");
     }
   };
 
@@ -139,8 +152,8 @@ const EmployeePage = () => {
           style={{ backgroundColor: "#8DD3BB" }}
           onClick={() => {
             setCurrentEmployee(null);
-            form.resetFields();
-            setModalOpen(true);
+            formAdd.resetFields();
+            setModalAddOpen(true);
           }}
         >
           Add Employee
@@ -193,36 +206,15 @@ const EmployeePage = () => {
 
       <Modal
         centered
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
+        open={modalAddOpen}
+        onCancel={() => setModalAddOpen(false)}
         footer={null}
       >
-        <Typography.Title level={4}>
-          {currentEmployee ? "Edit Employee" : "Add Employee"}
-        </Typography.Title>
-        {currentEmployee && (
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <Avatar
-              size={100}
-              src={<Image src={currentEmployee.avatarUrl || '/default-avatar.png'} style={{ width: 100 }} />}
-            />
-            <Upload
-              name="avatar"
-              showUploadList={false}
-              beforeUpload={file => {
-                handleAvatarUpload(file);
-                return false;
-              }}
-            >
-              <Button icon={<UploadOutlined />}>Change Avatar</Button>
-            </Upload>
-          </div>
-        )}
+        <Typography.Title level={4}>Add Employee</Typography.Title>
         <Form
-          form={form}
+          form={formAdd}
           layout="vertical"
-          onFinish={onFinish}
-          initialValues={currentEmployee}
+          onFinish={onFinishAdd}
         >
           <Form.Item
             label="Username"
@@ -234,7 +226,7 @@ const EmployeePage = () => {
               },
             ]}
           >
-            <Input disabled={!!currentEmployee} />
+            <Input />
           </Form.Item>
 
           <Form.Item
@@ -250,20 +242,18 @@ const EmployeePage = () => {
             <Input />
           </Form.Item>
 
-          {!currentEmployee && (
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter password!",
-                },
-              ]}
-            >
-              <Input.Password />
-            </Form.Item>
-          )}
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please enter password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
 
           <Form.Item
             label="Full Name"
@@ -362,6 +352,152 @@ const EmployeePage = () => {
                   {location.locationName}
                 </Select.Option>
               ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        centered
+        open={modalEditOpen}
+        onCancel={() => setModalEditOpen(false)}
+        footer={null}
+      >
+        <Typography.Title level={4}>Edit Employee</Typography.Title>
+        {currentEmployee && (
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <Avatar
+              size={100}
+              src={<Image src={currentEmployee.avatarUrl || '/default-avatar.png'} style={{ width: 100 }} />}
+            />
+            <Upload
+              name="avatar"
+              showUploadList={false}
+              beforeUpload={file => {
+                handleAvatarUpload(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>Change Avatar</Button>
+            </Upload>
+          </div>
+        )}
+        <Form
+          form={formEdit}
+          layout="vertical"
+          onFinish={onFinishEdit}
+          initialValues={currentEmployee}
+        >
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Please enter username!",
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please enter email!",
+              },
+            ]}
+          >
+            <Input disabled />
+          </Form.Item>
+
+          <Form.Item
+            label="Full Name"
+            name="fullName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter full name!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              {
+                required: true,
+                message: "Please enter phone number!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[
+              {
+                required: true,
+                message: "Please enter address!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Personal ID"
+            name="personalId"
+            rules={[
+              {
+                required: true,
+                message: "Please enter personal ID!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Date of Birth"
+            name="dayOfBirth"
+            rules={[
+              {
+                required: true,
+                message: "Please select date of birth!",
+              },
+            ]}
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: "Please select gender!",
+              },
+            ]}
+          >
+            <Select>
+              <Select.Option value="Male">Male</Select.Option>
+              <Select.Option value="Female">Female</Select.Option>
             </Select>
           </Form.Item>
 
