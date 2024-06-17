@@ -3,8 +3,12 @@ import OverviewPage from "../modules/overview/pages/OverviewPage";
 
 import MainLayout from "../layouts/MainLayout";
 import ChatPage from "../modules/chat/pages/ChatPage";
-import FlightsPage from "../modules/flights/pages/FlightsPage";
 import PricePage from "../modules/price/pages/PricePage";
+import LocationPage from "../modules/locations/pages/LocationPage";
+import DonationPage from "../modules/donations/pages/DonationPage";
+import MaterialsPage from "../modules/materials/pages/MaterialsPage";
+import AchivementLevelPage from "../modules/achivements/AchivementLevelPage";
+import EmployeePage from "../modules/employees/EmployeePage";
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -20,26 +24,46 @@ export default function useRouteElements() {
       path: "/flights",
       element: (
         <MainLayout>
-          <FlightsPage />
+          <DonationPage />
         </MainLayout>
       ),
     },
     {
-      path: "/price",
+      path: "/locations",
       element: (
         <MainLayout>
-          <PricePage />
+          <LocationPage />
         </MainLayout>
       ),
     },
+
     {
-      path: "/chat",
+      path: "/materials",
       element: (
         <MainLayout>
-          <ChatPage />
+          <MaterialsPage />
         </MainLayout>
       ),
     },
+
+    {
+      path: "/achivement_levels",
+      element: (
+        <MainLayout>
+          <AchivementLevelPage />
+        </MainLayout>
+      ),
+    },
+
+    {
+      path: "/employees",
+      element: (
+        <MainLayout>
+          <EmployeePage />
+        </MainLayout>
+      ),
+    },
+
     {
       path: "*",
       element: <h1>Not Found</h1>,

@@ -30,9 +30,12 @@
   font-weight: bold;
 }
 
-.ant-input {
+.ant-input,
+.ant-picker,
+.ant-upload-list-picture-card-container {
   border-radius: 4px;
 }
+
 
 .ant-btn-primary {
   width: 100%;

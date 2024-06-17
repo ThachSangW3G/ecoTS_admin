@@ -8,6 +8,7 @@ import DashboardIcon from "../assets/icons/DashboardIcon";
 import FlightIcon from "../assets/icons/FlightIcon";
 import { Link } from "react-router-dom";
 import PriceIcon from "../assets/icons/PriceIcon";
+import LocationIcon from "../assets/icons/LocationIcon";
 
 const items = [
   {
@@ -21,14 +22,25 @@ const items = [
     label: <Link to="/flights">Donation Management</Link>,
   },
   {
-    key: "3",
-    icon: <PriceIcon />,
-    label: <Link to="/price">Price Management</Link>,
+    key: "4",
+    icon: <FlightIcon />,
+    label: <Link to="/locations">Location Management</Link>,
+  },
+
+  {
+    key: "5",
+    icon: <FlightIcon />,
+    label: <Link to="/materials">Material Management</Link>,
   },
   {
-    key: "4",
-    icon: <ChatIcon />,
-    label: <Link to="/chat">Chat</Link>,
+    key: "6",
+    icon: <FlightIcon />,
+    label: <Link to="/achivement_levels">Achivement Levels</Link>,
+  },
+  {
+    key: "7",
+    icon: <FlightIcon />,
+    label: <Link to="/employees">Employees Management</Link>,
   },
 ];
 
