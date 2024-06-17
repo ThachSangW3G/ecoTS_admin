@@ -21,7 +21,9 @@ const { Search } = Input;
 import "./DonationPage.css";
 import {
   createDonation,
+  deleteDonation,
   getAllDonations,
+  updateDonation,
 } from "../../../services/DonationService";
 import { compareAsc, format } from "date-fns";
 
@@ -49,6 +51,9 @@ const DonationPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalDelete, setIsModalDelete] = useState(false);
+  const [selectId, setSelectId] = useState(null);
+  const [event, setEvent] = useState(null);
 
   const [form] = Form.useForm();
 
@@ -70,26 +75,36 @@ const DonationPage = () => {
 
     setLoading(true);
 
-    const success = await createDonation(
-      values.title,
-      values.name,
-      values.description,
-      format(startDate, "yyyy-MM-dd"),
-      format(endDate, "yyyy-MM-dd"),
-      formData
-    );
+    const success =
+      event === "add"
+        ? await createDonation(
+            values.title,
+            values.name,
+            values.description,
+            format(startDate, "yyyy-MM-dd HH:mm:ss"),
+            format(endDate, "yyyy-MM-dd HH:mm:ss"),
+            formData
+          )
+        : await updateDonation(
+            selectId,
+            values.title,
+            values.name,
+            values.description,
+            format(startDate, "yyyy-MM-dd HH:mm:ss"),
+            format(endDate, "yyyy-MM-dd HH:mm:ss"),
+            formData
+          );
 
     if (success) {
       setModalOpen(false);
-      form.setFieldsValue({
-        title: "",
-        name: "",
-        description: "",
-        startDate: "",
-        endDate: "",
-        coverImages: [],
-        sponsorImages: [],
-      });
+      form.resetFields();
+
+      if (event === "add") {
+        message.success("Added successfully!");
+      } else {
+        message.success("Updated successfully!");
+      }
+
       callGetDoations();
     }
 
@@ -112,6 +127,21 @@ const DonationPage = () => {
     callGetDoations();
   }, []);
 
+  const handleOkDelete = async () => {
+    const success = await deleteDonation(selectId);
+    if (success) {
+      message.success("Deleted successfully!");
+      setSelectId(null);
+      callGetMaterials();
+    }
+
+    setIsModalDelete(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsModalDelete(false);
+  };
+
   return (
     <Flex vertical gap="large">
       <Typography.Title level={2}>Donations Management</Typography.Title>
@@ -129,151 +159,14 @@ const DonationPage = () => {
             fontWeight: 500,
             width: "fit-content",
           }}
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            setModalOpen(true);
+            setEvent("add");
+            form.resetFields();
+          }}
         >
           Add Donation
         </Button>
-        <Modal
-          centered
-          open={modalOpen}
-          onCancel={() => setModalOpen(false)}
-          footer={null}
-        >
-          <Flex vertical align="center">
-            <div className="form-container">
-              <h1 className="form-title">A new donation infromation</h1>
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                  title: "",
-                  name: "",
-                  description: "",
-                  startDate: null,
-                  endDate: null,
-                  sponsorImages: [],
-                  coverImages: [],
-                }}
-              >
-                <Form.Item
-                  label="Title"
-                  name="title"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter title!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Name"
-                  name="name"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter title!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Description"
-                  name="description"
-                  rules={[
-                    {
-                      required: true,
-
-                      message: "Please enter description!",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Start date"
-                  name="startDate"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Plase select start date!",
-                    },
-                  ]}
-                >
-                  <DatePicker />
-                </Form.Item>
-
-                <Form.Item
-                  label="End date"
-                  name="endDate"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Plase select end date!",
-                    },
-                  ]}
-                >
-                  <DatePicker />
-                </Form.Item>
-
-                <Form.Item
-                  label="Sponsor images"
-                  name="sponsorImages"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  extra="Chọn hoặc kéo thả file vào đây"
-                >
-                  <Dragger
-                    name="sponsorImages"
-                    multiple={true}
-                    action="/upload.do"
-                    listType="picture"
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <UploadOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                      Nhấp hoặc kéo tệp vào khu vực này để tải lên
-                    </p>
-                  </Dragger>
-                </Form.Item>
-
-                <Form.Item
-                  label="Cover images"
-                  name="coverImages"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  extra="Chọn hoặc kéo thả file vào đây"
-                >
-                  <Dragger
-                    name="coverImages"
-                    multiple={true}
-                    action="/upload.do"
-                    listType="picture"
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <UploadOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                      Nhấp hoặc kéo tệp vào khu vực này để tải lên
-                    </p>
-                  </Dragger>
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Gửi
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-          </Flex>
-        </Modal>
       </Flex>
       <Table dataSource={donations}>
         <Column title="ID" dataIndex="id" key="id" />
@@ -371,14 +264,180 @@ const DonationPage = () => {
           key="action"
           render={(_, record) => (
             <Space size="middle">
-              <Button type="primary" style={{ backgroundColor: "#8DD3BB" }}>
+              <Button
+                type="primary"
+                style={{ backgroundColor: "#8DD3BB" }}
+                onClick={() => {
+                  setSelectId(record.id);
+                  setModalOpen(true);
+                  setEvent("update");
+                  form.setFieldsValue({
+                    title: record.title,
+                    name: record.name,
+                    description: record.description,
+                    startDate: null,
+                    endDate: null,
+                    sponsorImages: [],
+                    coverImages: [],
+                  });
+                }}
+              >
                 Edit
               </Button>
-              <Button danger>Delete</Button>
+              <Button
+                danger
+                onClick={() => {
+                  setIsModalDelete(true);
+                  setSelectId(record.id);
+                }}
+              >
+                Delete
+              </Button>
             </Space>
           )}
         />
       </Table>
+
+      <Modal
+        title="Confirm Delete"
+        open={isModalDelete}
+        onOk={handleOkDelete}
+        onCancel={handleCancelDelete}
+        centered
+      >
+        <p>Are you sure you want to delete this donation?</p>
+      </Modal>
+
+      <Modal
+        centered
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
+        footer={null}
+      >
+        <Flex vertical align="center">
+          <div className="form-container">
+            <Typography.Title level={4}>
+              {event === "add" ? "Add Donation" : "Edit Donation"}
+            </Typography.Title>
+            <Form form={form} layout="vertical" onFinish={onFinish}>
+              <Form.Item
+                label="Title"
+                name="title"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter title!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter title!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Description"
+                name="description"
+                rules={[
+                  {
+                    required: true,
+
+                    message: "Please enter description!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Start date"
+                name="startDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Plase select start date!",
+                  },
+                ]}
+              >
+                <DatePicker />
+              </Form.Item>
+
+              <Form.Item
+                label="End date"
+                name="endDate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Plase select end date!",
+                  },
+                ]}
+              >
+                <DatePicker />
+              </Form.Item>
+
+              <Form.Item
+                label="Sponsor images"
+                name="sponsorImages"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chọn hoặc kéo thả file vào đây"
+              >
+                <Dragger
+                  name="sponsorImages"
+                  multiple={true}
+                  action="/upload.do"
+                  listType="picture"
+                >
+                  <p className="ant-upload-drag-icon">
+                    <UploadOutlined />
+                  </p>
+                  <p className="ant-upload-text">
+                    Nhấp hoặc kéo tệp vào khu vực này để tải lên
+                  </p>
+                </Dragger>
+              </Form.Item>
+
+              <Form.Item
+                label="Cover images"
+                name="coverImages"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chọn hoặc kéo thả file vào đây"
+              >
+                <Dragger
+                  name="coverImages"
+                  multiple={true}
+                  action="/upload.do"
+                  listType="picture"
+                >
+                  <p className="ant-upload-drag-icon">
+                    <UploadOutlined />
+                  </p>
+                  <p className="ant-upload-text">
+                    Nhấp hoặc kéo tệp vào khu vực này để tải lên
+                  </p>
+                </Dragger>
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  {event === "add" ? "Add" : "Update"}
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+        </Flex>
+      </Modal>
     </Flex>
   );
 };

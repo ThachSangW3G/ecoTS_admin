@@ -53,3 +53,35 @@ export const createDonation = async (title, name, description, startDate, endDat
         return false;
     }
 }
+
+export const updateDonation = async (id, title, name, description, startDate, endDate, formData) => {
+    try {
+        const response = await axios.put(`${API_URL}/admin/donate/update-donation/${id}?title=${title}&name=${name}&description=${description}&startDate=${startDate}&endDate=${endDate}`, formData);
+        console.log(response.data);
+        console.log(response.status);
+        if (response.status === 200 || response.status == 201) {
+            return true
+        }
+        return false
+    } catch (e) {
+        console.error('Error fetching:', e);
+        return false;
+    }
+}
+
+export const deleteDonation = async (id) => {
+    try {
+        const response = await axios.delete(`${API_URL}/delete-donation-by-id?donationId=${id}`);
+        console.log(response.data);
+        console.log(response.status);
+        if (response.status === 200 || response.status == 201) {
+            return true
+        }
+        return false
+    } catch (e) {
+        console.error('Error fetching:', e);
+        return false;
+    }
+}
+
+

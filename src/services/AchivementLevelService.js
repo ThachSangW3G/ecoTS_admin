@@ -64,3 +64,17 @@ export const updateAchivementLevel = async (id, name, description, maxIndex, ach
 }
 
 
+export const deleteAchievementLevel = async (id) => {
+    try {
+        const response = await axios.delete(`${API_URL}/achievement/delete-achievement-level?achievementLevelId=${id}`);
+        console.log(response.data);
+        console.log(response.status);
+        if (response.status === 200 || response.status == 201) {
+            return true
+        }
+        return false
+    } catch (e) {
+        console.error('Error fetching:', e);
+        return false;
+    }
+}
