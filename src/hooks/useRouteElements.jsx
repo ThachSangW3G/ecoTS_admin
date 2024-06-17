@@ -10,7 +10,7 @@ import MaterialsPage from "../modules/materials/pages/MaterialsPage";
 import AchivementLevelPage from "../modules/achivements/AchivementLevelPage";
 import EmployeePage from "../modules/employees/EmployeePage";
 import DetectResponsePage from "../modules/detect_response/DetectResponsePage";
-
+import QuizManagementPage from "../modules/quiz/QuizManagementPage"
 export default function useRouteElements() {
   const routeElements = useRoutes([
     {
@@ -69,6 +69,14 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <DetectResponsePage />
+        </MainLayout>
+      ),
+    },
+    {
+      path: "/quiz-management",
+      element: (
+        <MainLayout>
+          <QuizManagementPage />
         </MainLayout>
       ),
     },
