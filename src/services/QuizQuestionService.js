@@ -50,8 +50,8 @@ export const updateQuizQuestion = async (id, topicId, questionText, correctAnswe
 
 export const deleteQuizQuestion = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/delete-question-from-topic`, {
-            params: { questionId: id }
+        const response = await axios.delete(`${API_URL}/delete`, {
+            params: { id }
         });
         return response.data;
     } catch (error) {
