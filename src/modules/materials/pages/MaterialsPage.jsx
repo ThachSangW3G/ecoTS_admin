@@ -8,11 +8,16 @@ import {
   Modal,
   message,
   Form,
-  Select
+  Select,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import "./MaterialsPage.css";
-import { createMaterial, deleteMaterial, getAllMaterials, updateMaterial } from "../../../services/MaterialService";
+import {
+  createMaterial,
+  deleteMaterial,
+  getAllMaterials,
+  updateMaterial,
+} from "../../../services/MaterialService";
 
 const { Column } = Table;
 const { Search } = Input;
@@ -47,8 +52,19 @@ const MaterialsPage = () => {
 
     const success =
       event === "add"
-        ? await createMaterial(values.name, pointsPerKg, co2SavedPerKg, values.type)
-        : await updateMaterial(selectId, values.name, pointsPerKg, co2SavedPerKg, values.type);
+        ? await createMaterial(
+            values.name,
+            pointsPerKg,
+            co2SavedPerKg,
+            values.type
+          )
+        : await updateMaterial(
+            selectId,
+            values.name,
+            pointsPerKg,
+            co2SavedPerKg,
+            values.type
+          );
 
     if (success) {
       setModalOpen(false);
@@ -82,7 +98,7 @@ const MaterialsPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <Typography.Title level={2}>Materials Management</Typography.Title>
       <Space style={{ marginBottom: 16 }}>
         <Search
@@ -105,9 +121,17 @@ const MaterialsPage = () => {
       <Table dataSource={materials} rowKey="id">
         <Column title="ID" dataIndex="id" key="id" />
         <Column title="Name" dataIndex="name" key="name" />
-        <Column title="Points per Kg" dataIndex="pointsPerKg" key="pointsPerKg" />
-        <Column title="Saved Co2 per Kg" dataIndex="co2SavedPerKg" key="co2SavedPerKg" />
-        <Column title="Type" dataIndex="type" key="type" />
+        <Column
+          title="Points per Kg"
+          dataIndex="pointsPerKg"
+          key="pointsPerKg"
+        />
+        <Column
+          title="Saved Co2 per Kg"
+          dataIndex="co2SavedPerKg"
+          key="co2SavedPerKg"
+        />
+
         <Column
           title="Action"
           key="action"
@@ -160,12 +184,10 @@ const MaterialsPage = () => {
         onCancel={() => setModalOpen(false)}
         footer={null}
       >
-        <Typography.Title level={4}>{event === "add" ? "Add Material" : "Edit Material"}</Typography.Title>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-        >
+        <Typography.Title level={4}>
+          {event === "add" ? "Add Material" : "Edit Material"}
+        </Typography.Title>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
             label="Name of material"
             name="name"
