@@ -47,6 +47,11 @@ const items = [
     icon: <FlightIcon />,
     label: <Link to="/detect-response">Detect Response</Link>,
   },
+  {
+    key: "9",
+    icon: <FlightIcon />,
+    label: <Link to="/quiz-management">Quiz Management</Link>,
+  },
 ];
 
 const MainLayout = ({ children }) => {
