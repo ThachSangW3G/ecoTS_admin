@@ -17,11 +17,12 @@ export const getAllQuizQuestions = async (topicId) => {
 export const addNewQuizQuestion = async (topicId, questionText, correctAnswer, incorrectAnswer1, incorrectAnswer2) => {
     try {
         const response = await axios.post(`${API_URL}/add-new-question-to-topic`, {
-            topicId,
             questionText,
             correctAnswer,
             incorrectAnswer1,
             incorrectAnswer2,
+        }, {
+            params: { topicId }
         });
         return response.data;
     } catch (error) {
@@ -50,7 +51,7 @@ export const updateQuizQuestion = async (id, topicId, questionText, correctAnswe
 export const deleteQuizQuestion = async (id) => {
     try {
         const response = await axios.delete(`${API_URL}/delete-question-from-topic`, {
-            data: { questionId: id },
+            params: { questionId: id }
         });
         return response.data;
     } catch (error) {
