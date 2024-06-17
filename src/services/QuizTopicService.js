@@ -61,13 +61,7 @@ export const updateQuizTopic = async (id, topicName, description, file) => {
 
 export const deleteQuizTopic = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/delete`, {
-            params: { id },
-            headers: {
-                // Add authorization header if needed
-                // 'Authorization': 'Bearer your_api_key_or_token'
-            },
-        });
+        const response = await axios.delete(`${API_URL}/delete/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting quiz topic:', error);

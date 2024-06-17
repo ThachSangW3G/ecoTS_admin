@@ -50,9 +50,7 @@ export const updateQuizQuestion = async (id, topicId, questionText, correctAnswe
 
 export const deleteQuizQuestion = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/delete`, {
-            params: { id }
-        });
+        const response = await axios.delete(`${API_URL}/delete/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting quiz question:', error);
