@@ -15,7 +15,9 @@ export const getAllQuizTopics = async () => {
 export const addNewQuizTopic = async (topicName, description, file) => {
     try {
         const formData = new FormData();
-        formData.append('multipartFile', file.originFileObj);
+        formData.append('multipartFile', file);
+
+        console.log(file)
 
         const response = await axios.post(`${API_URL}/add-new`, formData, {
             params: {
