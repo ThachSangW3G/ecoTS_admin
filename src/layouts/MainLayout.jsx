@@ -37,6 +37,11 @@ const items = [
     icon: <FlightIcon />,
     label: <Link to="/achivement_levels">Achivement Levels</Link>,
   },
+  {
+    key: "7",
+    icon: <FlightIcon />,
+    label: <Link to="/employees">Employees Management</Link>,
+  },
 ];
 
 const MainLayout = ({ children }) => {

@@ -1,4 +1,4 @@
-const API_URL = 'https://ecotsbe-production.up.railway.app/'
+const API_URL = 'https://ecotsbe-production.up.railway.app'
 import axios from 'axios';
 import {  format } from "date-fns";
 import {Donation} from '../models/Donation'

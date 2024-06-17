@@ -8,6 +8,7 @@ import LocationPage from "../modules/locations/pages/LocationPage";
 import DonationPage from "../modules/donations/pages/DonationPage";
 import MaterialsPage from "../modules/materials/pages/MaterialsPage";
 import AchivementLevelPage from "../modules/achivements/AchivementLevelPage";
+import EmployeePage from "../modules/employees/EmployeePage";
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -50,6 +51,15 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <AchivementLevelPage />
+        </MainLayout>
+      ),
+    },
+
+    {
+      path: "/employees",
+      element: (
+        <MainLayout>
+          <EmployeePage />
         </MainLayout>
       ),
     },
