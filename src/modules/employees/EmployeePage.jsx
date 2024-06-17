@@ -18,7 +18,7 @@ import {
 import axios from "axios";
 import dayjs from 'dayjs';
 import { UploadOutlined } from '@ant-design/icons';
-
+import Icon from '../../assets/icons'
 const { Column } = Table;
 const { Search } = Input;
 
@@ -295,19 +295,6 @@ const EmployeePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Personal ID"
-            name="personalId"
-            rules={[
-              {
-                required: true,
-                message: "Please enter personal ID!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
             label="Date of Birth"
             name="dayOfBirth"
             rules={[
@@ -318,22 +305,6 @@ const EmployeePage = () => {
             ]}
           >
             <DatePicker />
-          </Form.Item>
-
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: "Please select gender!",
-              },
-            ]}
-          >
-            <Select>
-              <Select.Option value="Male">Male</Select.Option>
-              <Select.Option value="Female">Female</Select.Option>
-            </Select>
           </Form.Item>
 
           <Form.Item
@@ -374,7 +345,7 @@ const EmployeePage = () => {
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <Avatar
               size={100}
-              src={<Image src={currentEmployee.avatarUrl || '/default-avatar.png'} style={{ width: 100 }} />}
+              src={<Image src={currentEmployee.avatarUrl || Icon.UserIcon} style={{ width: 100 }} />}
             />
             <Upload
               name="avatar"
@@ -483,22 +454,6 @@ const EmployeePage = () => {
             ]}
           >
             <DatePicker />
-          </Form.Item>
-
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: "Please select gender!",
-              },
-            ]}
-          >
-            <Select>
-              <Select.Option value="Male">Male</Select.Option>
-              <Select.Option value="Female">Female</Select.Option>
-            </Select>
           </Form.Item>
 
           <Form.Item>
