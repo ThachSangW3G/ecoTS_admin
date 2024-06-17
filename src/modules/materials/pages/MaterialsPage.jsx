@@ -8,13 +8,11 @@ import {
   Modal,
   message,
   Form,
-  Select
 } from "antd";
 import { getAllMaterials, updateMaterial } from "../../../services/MaterialService";
 
 const { Column } = Table;
 const { Search } = Input;
-const { Option } = Select;
 
 const MaterialsPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,11 +36,10 @@ const MaterialsPage = () => {
 
     const pointsPerKg = parseFloat(values.pointsPerKg);
     const co2SavedPerKg = parseFloat(values.co2SavedPerKg);
-    const type = values.type;
 
     setLoading(true);
 
-    const success = await updateMaterial(selectId, pointsPerKg, co2SavedPerKg, type);
+    const success = await updateMaterial(selectId, pointsPerKg, co2SavedPerKg);
 
     if (success) {
       setModalOpen(false);
@@ -157,11 +154,7 @@ const MaterialsPage = () => {
               },
             ]}
           >
-            <Select>
-              <Option value="type1">Type 1</Option>
-              <Option value="type2">Type 2</Option>
-              <Option value="type3">Type 3</Option>
-            </Select>
+            <Input disabled />
           </Form.Item>
 
           <Form.Item>
