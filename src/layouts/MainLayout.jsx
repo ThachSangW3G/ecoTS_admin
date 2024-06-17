@@ -3,13 +3,9 @@ import Sider from "antd/es/layout/Sider";
 import { Content } from "antd/es/layout/layout";
 
 import "./MainLayout.css";
-import ChatIcon from "../assets/icons/ChatIcon";
 import DashboardIcon from "../assets/icons/DashboardIcon";
-import FlightIcon from "../assets/icons/FlightIcon";
 import { Link } from "react-router-dom";
-import PriceIcon from "../assets/icons/PriceIcon";
-import LocationIcon from "../assets/icons/LocationIcon";
-
+import Icon from "../assets/icons";
 const items = [
   {
     key: "1",
@@ -18,38 +14,37 @@ const items = [
   },
   {
     key: "2",
-    icon: <FlightIcon />,
-    label: <Link to="/flights">Donation Management</Link>,
+    icon: <img src={Icon.DonationIcon} alt="Donation" style={{ width: '24px', height: '24px' }} />,
+    label: <Link to="/donations">Donation Management</Link>,
   },
   {
     key: "4",
-    icon: <FlightIcon />,
+    icon: <img src={Icon.LocationIcon} alt="Location" style={{ width: '24px', height: '24px' }} />,
     label: <Link to="/locations">Location Management</Link>,
   },
-
   {
     key: "5",
-    icon: <FlightIcon />,
+    icon: <img src={Icon.MaterialIcon} alt="Material" style={{ width: '24px', height: '24px' }} />,
     label: <Link to="/materials">Material Management</Link>,
   },
   {
     key: "6",
-    icon: <FlightIcon />,
-    label: <Link to="/achivement_levels">Achivement Levels</Link>,
+    icon: <img src={Icon.AchievementIcon} alt="Achievement" style={{ width: '24px', height: '24px' }} />,
+    label: <Link to="/achivement_levels">Achievement Levels</Link>,
   },
   {
     key: "7",
-    icon: <FlightIcon />,
+    icon: <img src={Icon.EmployeeIcon} alt="Employee" style={{ width: '24px', height: '24px' }} />,
     label: <Link to="/employees">Employees Management</Link>,
   },
   {
     key: "8",
-    icon: <FlightIcon />,
+    icon: <img src={Icon.DetectIcon} alt="Detect" style={{ width: '24px', height: '24px' }} />,
     label: <Link to="/detect-response">Detect Response</Link>,
   },
   {
     key: "9",
-    icon: <FlightIcon />,
+    icon: <img src={Icon.QuizIcon} alt="Quiz" style={{ width: '24px', height: '24px' }} />,
     label: <Link to="/quiz-management">Quiz Management</Link>,
   },
 ];

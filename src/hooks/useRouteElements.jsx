@@ -22,7 +22,7 @@ export default function useRouteElements() {
       ),
     },
     {
-      path: "/flights",
+      path: "/donations",
       element: (
         <MainLayout>
           <DonationPage />
