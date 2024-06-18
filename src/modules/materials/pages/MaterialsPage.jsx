@@ -8,20 +8,13 @@ import {
   Modal,
   message,
   Form,
-  Select,
+
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import "./MaterialsPage.css";
-import {
-  createMaterial,
-  deleteMaterial,
-  getAllMaterials,
-  updateMaterial,
-} from "../../../services/MaterialService";
+import { getAllMaterials, updateMaterial } from "../../../services/MaterialService";
+
 
 const { Column } = Table;
 const { Search } = Input;
-const { Option } = Select;
 
 const MaterialsPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,8 +22,6 @@ const MaterialsPage = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [materials, setMaterials] = useState([]);
-  const [isModalDelete, setIsModalDelete] = useState(false);
-  const [event, setEvent] = useState(null);
 
   const callGetMaterials = async () => {
     setMaterials(await getAllMaterials());
@@ -50,51 +41,16 @@ const MaterialsPage = () => {
 
     setLoading(true);
 
-    const success =
-      event === "add"
-        ? await createMaterial(
-            values.name,
-            pointsPerKg,
-            co2SavedPerKg,
-            values.type
-          )
-        : await updateMaterial(
-            selectId,
-            values.name,
-            pointsPerKg,
-            co2SavedPerKg,
-            values.type
-          );
+    const success = await updateMaterial(selectId, pointsPerKg, co2SavedPerKg);
 
     if (success) {
       setModalOpen(false);
       form.resetFields();
-
-      if (event === "add") {
-        message.success("Added successfully!");
-      } else {
-        message.success("Updated successfully!");
-      }
-
+      message.success("Updated successfully!");
       callGetMaterials();
     }
 
     setLoading(false);
-  };
-
-  const handleOkDelete = async () => {
-    const success = await deleteMaterial(selectId);
-    if (success) {
-      message.success("Deleted successfully!");
-      setSelectId(null);
-      callGetMaterials();
-    }
-
-    setIsModalDelete(false);
-  };
-
-  const handleCancelDelete = () => {
-    setIsModalDelete(false);
   };
 
   return (
@@ -106,17 +62,6 @@ const MaterialsPage = () => {
           onSearch={onSearch}
           enterButton
         />
-        <Button
-          type="primary"
-          style={{ backgroundColor: "#8DD3BB" }}
-          onClick={() => {
-            setModalOpen(true);
-            setEvent("add");
-            form.resetFields();
-          }}
-        >
-          Add Material
-        </Button>
       </Space>
       <Table dataSource={materials} rowKey="id">
         <Column title="ID" dataIndex="id" key="id" />
@@ -143,7 +88,6 @@ const MaterialsPage = () => {
                 onClick={() => {
                   setSelectId(record.id);
                   setModalOpen(true);
-                  setEvent("update");
                   form.setFieldsValue({
                     name: record.name,
                     pointsPerKg: record.pointsPerKg,
@@ -154,29 +98,10 @@ const MaterialsPage = () => {
               >
                 Edit
               </Button>
-              <Button
-                danger
-                onClick={() => {
-                  setIsModalDelete(true);
-                  setSelectId(record.id);
-                }}
-              >
-                Delete
-              </Button>
             </Space>
           )}
         />
       </Table>
-
-      <Modal
-        title="Confirm Delete"
-        open={isModalDelete}
-        onOk={handleOkDelete}
-        onCancel={handleCancelDelete}
-        centered
-      >
-        <p>Are you sure you want to delete this material?</p>
-      </Modal>
 
       <Modal
         centered
@@ -184,10 +109,12 @@ const MaterialsPage = () => {
         onCancel={() => setModalOpen(false)}
         footer={null}
       >
-        <Typography.Title level={4}>
-          {event === "add" ? "Add Material" : "Edit Material"}
-        </Typography.Title>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Typography.Title level={4}>Edit Material</Typography.Title>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+        >
           <Form.Item
             label="Name of material"
             name="name"
@@ -198,7 +125,7 @@ const MaterialsPage = () => {
               },
             ]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
 
           <Form.Item
@@ -237,16 +164,12 @@ const MaterialsPage = () => {
               },
             ]}
           >
-            <Select>
-              <Option value="type1">Type 1</Option>
-              <Option value="type2">Type 2</Option>
-              <Option value="type3">Type 3</Option>
-            </Select>
+            <Input disabled />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              {event === "add" ? "Add" : "Update"}
+              Update
             </Button>
           </Form.Item>
         </Form>
