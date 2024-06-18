@@ -23,13 +23,16 @@ import { compareAsc, format, set } from "date-fns";
 import {
   createLocation,
   getAllLocations,
+  updateLocation,
 } from "../../../services/LocationService";
 
 const { Dragger } = Upload;
 
 const LocationPage = () => {
+  const [event, setEvent] = useState(null);
   const onSearch = (value, _e, info) => console.log(info?.source, value);
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectId, setSelectId] = useState(null);
 
   const [form] = Form.useForm();
 
@@ -51,26 +54,35 @@ const LocationPage = () => {
 
     setLoading(true);
 
-    const success = await createLocation(
-      values.locationName,
-      values.description,
-      values.address,
-      values.latitude,
-      values.longitude,
-      formData
-    );
+    const success =
+      event === "add"
+        ? await createLocation(
+            values.locationName,
+            values.description,
+            values.address,
+            values.latitude,
+            values.longitude,
+            formData
+          )
+        : await updateLocation(
+            selectId,
+
+            values.description,
+            values.address,
+            values.latitude,
+            values.longitude,
+            formData
+          );
 
     if (success) {
       setModalOpen(false);
-      form.setFieldsValue({
-        locationName: "",
-        description: "",
-        address: "",
-        latitude: 0,
-        longitude: 0,
-        backGroundImgUrl: null,
-        imgDetailsUrl: [],
-      });
+      form.resetFields();
+
+      if (event === "add") {
+        message.success("Added successfully!");
+      } else {
+        message.success("Updated successfully!");
+      }
 
       callGetLocations();
     }
@@ -114,7 +126,11 @@ const LocationPage = () => {
             fontWeight: 500,
             width: "fit-content",
           }}
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            setModalOpen(true);
+            setEvent("add");
+            form.resetFields();
+          }}
         >
           Add Location
         </Button>
@@ -126,20 +142,22 @@ const LocationPage = () => {
         >
           <Flex vertical align="center">
             <div className="form-container">
-              <h1 className="form-title">A new location infromation</h1>
+              <Typography.Title level={4}>
+                {event === "add" ? "Add Location" : "Edit Location"}
+              </Typography.Title>
               <Form
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
-                initialValues={{
-                  locationName: "",
-                  description: "",
-                  address: "",
-                  latitude: 0,
-                  longitude: 0,
-                  backGroundImgUrl: null,
-                  imgDetailsUrl: [],
-                }}
+                // initialValues={{
+                //   locationName: "",
+                //   description: "",
+                //   address: "",
+                //   latitude: 0,
+                //   longitude: 0,
+                //   backGroundImgUrl: null,
+                //   imgDetailsUrl: [],
+                // }}
               >
                 <Form.Item
                   label="Name of location"
@@ -252,7 +270,7 @@ const LocationPage = () => {
                 </Form.Item>
                 <Form.Item>
                   <Button type="primary" htmlType="submit" loading={loading}>
-                    Gửi
+                    {event === "add" ? "Add" : "Update"}
                   </Button>
                 </Form.Item>
               </Form>
@@ -312,10 +330,26 @@ const LocationPage = () => {
           key="action"
           render={(_, record) => (
             <Space size="middle">
-              <Button type="primary" style={{ backgroundColor: "#8DD3BB" }}>
+              <Button
+                type="primary"
+                style={{ backgroundColor: "#8DD3BB" }}
+                onClick={() => {
+                  setSelectId(record.id);
+                  setModalOpen(true);
+                  setEvent("update");
+                  form.setFieldsValue({
+                    locationName: record.locationName,
+                    description: record.description,
+                    address: record.typeOfLocation,
+                    latitude: record.latitude,
+                    longitude: record.longitude,
+                    backGroundImgUrl: null,
+                    imgDetailsUrl: [],
+                  });
+                }}
+              >
                 Edit
               </Button>
-              <Button danger>Delete</Button>
             </Space>
           )}
         />

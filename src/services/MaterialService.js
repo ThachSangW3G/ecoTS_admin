@@ -69,3 +69,4 @@ export const updateMaterial = async (id, pointsPerKg, co2SavedPerKg) => {
         return false;
     }
 }
+

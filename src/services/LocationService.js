@@ -29,14 +29,34 @@ export const getAllLocations = async () => {
 export const createLocation = async (locationName, description, address, latitude, longitude, formData) => {
     try {
 
-        console.log(locationName)
-        console.log(description)
-        console.log(address)
-        console.log(latitude)
-        console.log(longitude)
-        console.log(formData)
+      
         
         const response = await axios.post(`${API_URL}/location/create-new-location?locationName=${locationName}&description=${description}&address=${address}&latitude=${latitude}&longitude=${longitude}`, formData,  
+           );
+        console.log(response.data);
+        console.log(response.status);
+
+        if (response.status === 200) {
+            return true
+        }
+        console.log('post API')
+
+        return false
+       
+    } catch (e) {
+        console.error('Error fetching:', e);
+        return false;
+    
+       
+    }
+}
+
+export const updateLocation = async (id, description, address, latitude, longitude, formData) => {
+    try {
+
+      
+        
+        const response = await axios.put(`${API_URL}/location/update-location?locationId=${id}&description=${description}&address=${address}&latitude=${latitude}&longitude=${longitude}`, formData,  
            );
         console.log(response.data);
         console.log(response.status);

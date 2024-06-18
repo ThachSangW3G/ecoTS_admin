@@ -22,6 +22,7 @@ import "./AchivementLevelPage.css";
 
 import {
   addNewAchivementLevel,
+  deleteAchievementLevel,
   getAllAchivementLevel,
   updateAchivementLevel,
 } from "../../services/AchivementLevelService";
@@ -124,12 +125,12 @@ const AchivementLevelPage = () => {
   };
 
   const handleOkDelete = async () => {
-    // const success = await deleteMaterial(selectId);
-    // if (success) {
-    //   message.success("Xóa thành công!");
-    //   setSelectId(null);
-    //   callGetMaterials();
-    // }
+    const success = await deleteAchievementLevel(selectId);
+    if (success) {
+      message.success("Deleted successfully!");
+      setSelectId(null);
+      callGetAchivementLevels();
+    }
 
     setIsModalDelete(false);
   };
@@ -266,13 +267,13 @@ const AchivementLevelPage = () => {
 
                 <Form.Item
                   label="Image"
-                  name="imageUrl"
+                  name="imgUrl"
                   valuePropName="fileList"
                   getValueFromEvent={normFile}
                   extra="Chọn hoặc kéo thả file vào đây"
                 >
                   <Dragger
-                    name="imageUrl"
+                    name="imgUrl"
                     multiple={false}
                     action="/upload.do"
                     listType="picture"
@@ -350,7 +351,7 @@ const AchivementLevelPage = () => {
           )}
         />
 
-        <Column title="Type" dataIndex="maxIndex" key="maxIndex" />
+        <Column title="Max index" dataIndex="maxIndex" key="maxIndex" />
 
         <Column
           title="Type"
